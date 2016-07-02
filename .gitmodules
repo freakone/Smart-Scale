@@ -1,0 +1,3 @@
+[submodule "hx711"]
+	path = hx711
+	url = git@github.com:freakone/HX711.git
