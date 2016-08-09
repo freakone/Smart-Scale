@@ -70,34 +70,34 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 int main(void)
 {
 
-  /* USER CODE BEGIN 1 */
+	/* USER CODE BEGIN 1 */
 
-  /* USER CODE END 1 */
+	/* USER CODE END 1 */
 
-  /* MCU Configuration----------------------------------------------------------*/
+	/* MCU Configuration----------------------------------------------------------*/
 
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init();
-  /* Configure the system clock */
-  SystemClock_Config();
+	/* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+	HAL_Init();
+	/* Configure the system clock */
+	SystemClock_Config();
 
-  /* Initialize all configured peripherals */
-  MX_GPIO_Init();
-  MX_CRC_Init();
-  MX_USB_DEVICE_Init();
-  MX_TIM15_Init();
+	/* Initialize all configured peripherals */
+	MX_GPIO_Init();
+	MX_CRC_Init();
+	MX_USB_DEVICE_Init();
+	MX_TIM15_Init();
 
-  /* USER CODE BEGIN 2 */
-  HAL_TIM_PWM_Start(&htim15, TIM_CHANNEL_2);
+	/* USER CODE BEGIN 2 */
+	HAL_TIM_PWM_Start(&htim15, TIM_CHANNEL_2);
 
-   HX711 hx1;
-   hx1.GPIO = DO_SCK_1_GPIO_Port;
-   hx1.pinSck = DO_SCK_1_Pin;
-   hx1.pinData = DI_DATA_1_Pin;
-   hx1.gain = 3;
-   hx1.offset = 0;
+	HX711 hx1;
+	hx1.GPIO = DO_SCK_1_GPIO_Port;
+	hx1.pinSck = DO_SCK_1_Pin;
+	hx1.pinData = DI_DATA_1_Pin;
+	hx1.gain = 3;
+	hx1.offset = 0;
 
-   HX711_Init(hx1);
+	HX711_Init(hx1);
 
    int a = 0;
    uint8_t crc = HAL_CRC_Calculate(&hcrc, "asdfg", 5);
