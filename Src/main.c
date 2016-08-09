@@ -32,13 +32,13 @@
   */
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f0xx_hal.h"
+#include "crc.h"
 #include "tim.h"
 #include "usb_device.h"
 #include "gpio.h"
-#include "hx711.h"
 
 /* USER CODE BEGIN Includes */
-
+#include "hx711.h"
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
@@ -80,6 +80,7 @@ int main(void)
   MX_GPIO_Init();
   MX_USB_DEVICE_Init();
   MX_TIM6_Init();
+  MX_CRC_Init();
 
   /* USER CODE BEGIN 2 */
   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_9, GPIO_PIN_SET);
@@ -94,6 +95,7 @@ int main(void)
   HX711_Init(hx1);
 
   int a = 0;
+  uint8_t crc = CRC_Calc("asdfg", 5);
   /* USER CODE END 2 */
 
   /* Infinite loop */
