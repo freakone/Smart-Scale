@@ -1,7 +1,7 @@
 /**
   ******************************************************************************
-  * File Name          : mxconstants.h
-  * Description        : This file contains the common defines of the application
+  * @file    stm32f3xx_it.h
+  * @brief   This file contains the headers of the interrupt handlers.
   ******************************************************************************
   *
   * COPYRIGHT(c) 2016 STMicroelectronics
@@ -30,46 +30,36 @@
   *
   ******************************************************************************
   */
+
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __MXCONSTANT_H
-#define __MXCONSTANT_H
-  /* Includes ------------------------------------------------------------------*/
+#ifndef __STM32F3xx_IT_H
+#define __STM32F3xx_IT_H
 
-/* USER CODE BEGIN Includes */
+#ifdef __cplusplus
+ extern "C" {
+#endif 
 
-/* USER CODE END Includes */
+/* Includes ------------------------------------------------------------------*/
+/* Exported types ------------------------------------------------------------*/
+/* Exported constants --------------------------------------------------------*/
+/* Exported macro ------------------------------------------------------------*/
+/* Exported functions ------------------------------------------------------- */
 
-/* Private define ------------------------------------------------------------*/
+void NMI_Handler(void);
+void HardFault_Handler(void);
+void MemManage_Handler(void);
+void BusFault_Handler(void);
+void UsageFault_Handler(void);
+void SVC_Handler(void);
+void DebugMon_Handler(void);
+void PendSV_Handler(void);
+void SysTick_Handler(void);
+void USB_LP_CAN_RX0_IRQHandler(void);
 
-#define DO_SCK_1_Pin GPIO_PIN_1
-#define DO_SCK_1_GPIO_Port GPIOA
-#define DI_DATA_1_Pin GPIO_PIN_2
-#define DI_DATA_1_GPIO_Port GPIOA
-#define SPI_CS_Pin GPIO_PIN_12
-#define SPI_CS_GPIO_Port GPIOB
-#define DO_LED_1_Pin GPIO_PIN_13
-#define DO_LED_1_GPIO_Port GPIOB
-#define DO_SCK_2_Pin GPIO_PIN_14
-#define DO_SCK_2_GPIO_Port GPIOB
-#define DO_LED_2_Pin GPIO_PIN_15
-#define DO_LED_2_GPIO_Port GPIOB
-#define DI_DATA_2_Pin GPIO_PIN_8
-#define DI_DATA_2_GPIO_Port GPIOA
-#define DO_USBPWREN_Pin GPIO_PIN_15
-#define DO_USBPWREN_GPIO_Port GPIOA
-#define DO_BOOT_SET_Pin GPIO_PIN_7
-#define DO_BOOT_SET_GPIO_Port GPIOB
-/* USER CODE BEGIN Private defines */
+#ifdef __cplusplus
+}
+#endif
 
-/* USER CODE END Private defines */
+#endif /* __STM32F3xx_IT_H */
 
-/**
-  * @}
-  */ 
-
-/**
-  * @}
-*/ 
-
-#endif /* __MXCONSTANT_H */
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

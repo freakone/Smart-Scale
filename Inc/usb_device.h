@@ -38,8 +38,8 @@
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f0xx.h"
-#include "stm32f0xx_hal.h"
+#include "stm32f3xx.h"
+#include "stm32f3xx_hal.h"
 #include "usbd_def.h"
 
 extern USBD_HandleTypeDef hUsbDeviceFS;

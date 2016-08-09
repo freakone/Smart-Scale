@@ -1,10 +1,14 @@
 /**
   ******************************************************************************
-  * File Name          : mxconstants.h
-  * Description        : This file contains the common defines of the application
+  * @file    system_stm32f3xx.h
+  * @author  MCD Application Team
+  * @version V2.3.0
+  * @date    29-April-2015
+  * @brief   CMSIS Cortex-M4 Device System Source File for STM32F3xx devices.  
   ******************************************************************************
+  * @attention
   *
-  * COPYRIGHT(c) 2016 STMicroelectronics
+  * <h2><center>&copy; COPYRIGHT(c) 2016 STMicroelectronics</center></h2>
   *
   * Redistribution and use in source and binary forms, with or without modification,
   * are permitted provided that the following conditions are met:
@@ -29,47 +33,92 @@
   * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   *
   ******************************************************************************
-  */
-/* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __MXCONSTANT_H
-#define __MXCONSTANT_H
-  /* Includes ------------------------------------------------------------------*/
-
-/* USER CODE BEGIN Includes */
-
-/* USER CODE END Includes */
-
-/* Private define ------------------------------------------------------------*/
-
-#define DO_SCK_1_Pin GPIO_PIN_1
-#define DO_SCK_1_GPIO_Port GPIOA
-#define DI_DATA_1_Pin GPIO_PIN_2
-#define DI_DATA_1_GPIO_Port GPIOA
-#define SPI_CS_Pin GPIO_PIN_12
-#define SPI_CS_GPIO_Port GPIOB
-#define DO_LED_1_Pin GPIO_PIN_13
-#define DO_LED_1_GPIO_Port GPIOB
-#define DO_SCK_2_Pin GPIO_PIN_14
-#define DO_SCK_2_GPIO_Port GPIOB
-#define DO_LED_2_Pin GPIO_PIN_15
-#define DO_LED_2_GPIO_Port GPIOB
-#define DI_DATA_2_Pin GPIO_PIN_8
-#define DI_DATA_2_GPIO_Port GPIOA
-#define DO_USBPWREN_Pin GPIO_PIN_15
-#define DO_USBPWREN_GPIO_Port GPIOA
-#define DO_BOOT_SET_Pin GPIO_PIN_7
-#define DO_BOOT_SET_GPIO_Port GPIOB
-/* USER CODE BEGIN Private defines */
-
-/* USER CODE END Private defines */
-
-/**
-  * @}
   */ 
 
+/** @addtogroup CMSIS
+  * @{
+  */
+
+/** @addtogroup stm32f3xx_system
+  * @{
+  */  
+  
+/**
+  * @brief Define to prevent recursive inclusion
+  */
+#ifndef __SYSTEM_STM32F3XX_H
+#define __SYSTEM_STM32F3XX_H
+
+#ifdef __cplusplus
+ extern "C" {
+#endif 
+
+/** @addtogroup STM32F3xx_System_Includes
+  * @{
+  */
+
 /**
   * @}
-*/ 
+  */
 
-#endif /* __MXCONSTANT_H */
+
+/** @addtogroup STM32F3xx_System_Exported_types
+  * @{
+  */
+  /* This variable is updated in three ways:
+      1) by calling CMSIS function SystemCoreClockUpdate()
+      3) by calling HAL API function HAL_RCC_GetHCLKFreq()
+      3) by calling HAL API function HAL_RCC_ClockConfig()
+         Note: If you use this function to configure the system clock; then there
+               is no need to call the 2 first functions listed above, since SystemCoreClock
+               variable is updated automatically.
+  */
+extern uint32_t SystemCoreClock;          /*!< System Clock Frequency (Core Clock) */
+extern const uint8_t AHBPrescTable[16];   /*!< AHB prescalers table values */
+extern const uint8_t APBPrescTable[8];    /*!< APB prescalers table values */
+
+
+/**
+  * @}
+  */
+
+/** @addtogroup STM32F3xx_System_Exported_Constants
+  * @{
+  */
+
+/**
+  * @}
+  */
+
+/** @addtogroup STM32F3xx_System_Exported_Macros
+  * @{
+  */
+
+/**
+  * @}
+  */
+
+/** @addtogroup STM32F3xx_System_Exported_Functions
+  * @{
+  */
+  
+extern void SystemInit(void);
+extern void SystemCoreClockUpdate(void);
+/**
+  * @}
+  */
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /*__SYSTEM_STM32F3XX_H */
+
+/**
+  * @}
+  */
+  
+/**
+  * @}
+  */  
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

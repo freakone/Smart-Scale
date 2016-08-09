@@ -89,9 +89,7 @@ uint8_t UserRxBufferFS[APP_RX_DATA_SIZE];
 uint8_t UserTxBufferFS[APP_TX_DATA_SIZE];
 
 /* USER CODE BEGIN PRIVATE_VARIABLES */
-uint8_t command[APP_RX_DATA_SIZE];
-uint16_t length = 0;
-uint8_t status = 0;
+
 /* USER CODE END PRIVATE_VARIABLES */
 
 /**
@@ -254,68 +252,10 @@ static int8_t CDC_Control_FS  (uint8_t cmd, uint8_t* pbuf, uint16_t length)
 static int8_t CDC_Receive_FS (uint8_t* Buf, uint32_t *Len)
 {
   /* USER CODE BEGIN 6 */
-	  USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
-	  USBD_CDC_ReceivePacket(&hUsbDeviceFS);
+	USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
+	USBD_CDC_ReceivePacket(&hUsbDeviceFS);
 
-
-	  if (status == 0 && Buf[0] == '|')
-	  {
-		  status = 1;
-		  length = 0;
-	  }
-
-	  if (status == 1)
-	  {
-		  for (int i = 0; i < *Len; i++)
-		  {
-			  command[length] = Buf[i];
-			  length++;
-		  }
-	  }
-
-	  if (status == 1 && Buf[*Len-1] == '\n')
-	  {
-		  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_8, GPIO_PIN_SET);
-
-		  status = 0;
-
-		  uint8_t msg[30];
-		  msg[0] = '|';
-		  uint16_t offset = 1;
-
-		  if(command[1] == 'i' && command[2] == 'd')
-		  {
-			  unsigned long *id = (unsigned long *)0x1FFFF7AC;
-			  for( int i = 0; i < 3; i++)
-			  {
-				  offset += sprintf(&msg[offset], "%08X", id[i]);
-			  }
-			  msg[offset++] = '\n';
-			  CDC_Transmit_FS(msg, offset);
-		  }
-		  else if(command[1] == 'v' && command[2] == 'a' && command[3] == 'l')
-		  {
-			  srand(HAL_GetTick());
-			  for( int i = 0; i < 4; i++)
-			  {
-				  offset += sprintf(&msg[offset], ":%03X", rand() % 1500);
-			  }
-			  msg[offset++] = '\n';
-			  CDC_Transmit_FS(msg, offset);
-		  } else if(command[1] == 'c' && command[2] == 'a' &&
-				  command[3] == 'l' && command[4] >= '0' && command[4] <= '9')
-		  {
-			  memcpy(&msg[offset], "OK", 2);
-			  offset += 2;
-			  msg[offset++] = '\n';
-
-			  CDC_Transmit_FS(msg, offset);
-		  }
-
-
-	  }
-
-	  return (USBD_OK);
+	return (USBD_OK);
   /* USER CODE END 6 */ 
 }
 
