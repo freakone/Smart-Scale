@@ -35,7 +35,7 @@
 #include "usb_device.h"
 
 /* USER CODE BEGIN Includes */
-#include "hx711.h"
+#include "commands.h"
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
@@ -90,17 +90,30 @@ int main(void)
 	/* USER CODE BEGIN 2 */
 	HAL_TIM_PWM_Start(&htim15, TIM_CHANNEL_2);
 
-	HX711 hx1;
-	hx1.GPIO = DO_SCK_1_GPIO_Port;
+	hx1.gpioSck = DO_SCK_1_GPIO_Port;
+	hx1.gpioData = DI_DATA_1_GPIO_Port;
 	hx1.pinSck = DO_SCK_1_Pin;
 	hx1.pinData = DI_DATA_1_Pin;
 	hx1.gain = 3;
-	hx1.offset = 0;
-
+	hx1.offsetA = 0;
+	hx1.offsetB = 0;
+	hx1.readingA = 0;
+	hx1.readingB = 0;
 	HX711_Init(hx1);
 
-   int a = 0;
-   uint8_t crc = HAL_CRC_Calculate(&hcrc, "asdfg", 5);
+	hx2.gpioSck = DO_SCK_2_GPIO_Port;
+	hx2.gpioData = DI_DATA_2_GPIO_Port;
+	hx2.pinSck = DO_SCK_2_Pin;
+	hx2.pinData = DI_DATA_2_Pin;
+	hx2.gain = 3;
+	hx2.offsetA = 0;
+	hx2.offsetB = 0;
+	hx2.readingA = 0;
+	hx2.readingB = 0;
+	HX711_Init(hx2);
+
+	iTare = 1;
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -110,10 +123,41 @@ int main(void)
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
-//	  HAL_GPIO_TogglePin(DO_USBPWREN_GPIO_Port, DO_USBPWREN_Pin);
+
+	  if (iTare)
+	  {
+		HX711_Average_Value(hx1, 100);
+		HX711_Average_Value(hx2, 100);
+
+		hx1.offsetA = HX711_Average_Value(hx1, 20);
+		hx2.offsetA = HX711_Average_Value(hx2, 20);
+
+		hx1.gain = 2;
+		hx2.gain = 2;
+
+		HX711_Average_Value(hx1, 100);
+		HX711_Average_Value(hx2, 100);
+
+		hx1.offsetB = HX711_Average_Value(hx1, 20);
+		hx2.offsetB = HX711_Average_Value(hx2, 20);
+		iTare = 0;
+	  }
+	  else
+	  {
+		  hx1.gain = 2;
+		  hx2.gain = 2;
+		  HX711_Average_Value(hx1, 2);
+		  HX711_Average_Value(hx2, 2);
+		  hx1.readingB = (HX711_Average_Value(hx1, 1) - hx1.offsetB)/10;
+		  hx2.readingB = (HX711_Average_Value(hx2, 1) - hx2.offsetB)/10;
+		  hx1.gain = 3;
+		  hx2.gain = 3;
+		  HX711_Average_Value(hx1, 2);
+		  HX711_Average_Value(hx2, 2);
+		  hx1.readingA = (HX711_Average_Value(hx1, 1) - hx1.offsetA)/20;
+		  hx2.readingA = (HX711_Average_Value(hx2, 1) - hx2.offsetA)/20;
+	  }
 	  HAL_GPIO_TogglePin(DO_LED_1_GPIO_Port, DO_LED_1_Pin);
-	  a = HX711_Value(hx1);
-	  HAL_Delay(1000);
   }
   /* USER CODE END 3 */
 

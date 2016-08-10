@@ -9,10 +9,12 @@
 #define COMMANDS_H_
 
 #include "stm32f3xx_hal.h"
+#include "hx711.h"
 
-uint8_t command[30];
-uint16_t length = 0;
-uint8_t status = 0;
+extern HX711 hx1;
+extern HX711 hx2;
+extern uint8_t iCalibration;
+extern uint8_t iTare;
 void Commands_BufferHandle(uint8_t* Buf, uint32_t *Len);
 void Commands_Parse(uint8_t* buf, uint8_t len);
 uint8_t _cmd_check(uint8_t* buf, uint8_t bufsize, uint8_t* cmd, uint8_t cmdsize);
