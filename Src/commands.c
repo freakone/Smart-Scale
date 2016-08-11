@@ -7,6 +7,8 @@ uint16_t length = 0;
 uint8_t status = 0;
 uint8_t iCalibration = 0;
 uint8_t iTare = 0;
+uint16_t temperature = 0;
+uint8_t iDFU = 0;
 
 void Commands_BufferHandle(uint8_t* Buf, uint32_t *Len)
 {
@@ -69,12 +71,11 @@ void Commands_Parse(uint8_t* buf, uint8_t len)
 	}
 	else if(_cmd_check(buf, len, "val", 3))
 	{
-
-	  offset += sprintf(&msg[offset], ":%03d", hx1.readingA);
-	  offset += sprintf(&msg[offset], ":%03d", hx1.readingB);
-	  offset += sprintf(&msg[offset], ":%03d", hx2.readingA);
-	  offset += sprintf(&msg[offset], ":%03d", hx2.readingB);
-	  offset += sprintf(&msg[offset], ":SUMA:%03d", (hx1.readingA/100 + hx1.readingB/100 + hx2.readingA/100 + hx2.readingB/100));
+	  offset += sprintf(&msg[offset], ":%03X", hx1.readingA);
+	  offset += sprintf(&msg[offset], ":%03X", hx1.readingB);
+	  offset += sprintf(&msg[offset], ":%03X", hx2.readingA);
+	  offset += sprintf(&msg[offset], ":%03X", hx2.readingB);
+	  offset += sprintf(&msg[offset], ":%03X", temperature);
 
 	  msg[offset++] = '\n';
 	  CDC_Transmit_FS(msg, offset);
@@ -93,6 +94,10 @@ void Commands_Parse(uint8_t* buf, uint8_t len)
 	  msg[offset++] = '\n';
 
 	  CDC_Transmit_FS(msg, offset);
+	}
+	else if(_cmd_check(buf, len, "dfu", 3))
+	{
+		iDFU = 1;
 	}
 
 }

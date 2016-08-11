@@ -39,6 +39,8 @@
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
+ADC_HandleTypeDef hadc1;
+
 CRC_HandleTypeDef hcrc;
 
 TIM_HandleTypeDef htim15;
@@ -54,6 +56,7 @@ void Error_Handler(void);
 static void MX_GPIO_Init(void);
 static void MX_CRC_Init(void);
 static void MX_TIM15_Init(void);
+static void MX_ADC1_Init(void);
 
 void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
                 
@@ -70,26 +73,35 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 int main(void)
 {
 
-	/* USER CODE BEGIN 1 */
+  /* USER CODE BEGIN 1 */
 
-	/* USER CODE END 1 */
+  /* USER CODE END 1 */
 
-	/* MCU Configuration----------------------------------------------------------*/
+  /* MCU Configuration----------------------------------------------------------*/
 
-	/* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-	HAL_Init();
-	/* Configure the system clock */
-	SystemClock_Config();
+  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+  HAL_Init();
 
-	/* Initialize all configured peripherals */
-	MX_GPIO_Init();
-	MX_CRC_Init();
-	MX_USB_DEVICE_Init();
-	MX_TIM15_Init();
+  /* Configure the system clock */
+  SystemClock_Config();
 
-	/* USER CODE BEGIN 2 */
+  /* Initialize all configured peripherals */
+  MX_GPIO_Init();
+  MX_CRC_Init();
+  MX_USB_DEVICE_Init();
+  MX_TIM15_Init();
+  MX_ADC1_Init();
+
+  /* USER CODE BEGIN 2 */
 	HAL_TIM_PWM_Start(&htim15, TIM_CHANNEL_2);
+	HAL_ADC_Start(&hadc1);
 
+	uint16_t ts_cal1 = *((uint16_t*)0x1FFFF7B8);
+	uint16_t ts_cal2 = *((uint16_t*)0x1FFFF7C2);
+	float Avg_Slope = ((float)(ts_cal1 - ts_cal2)) / (110 - 30);
+	uint16_t v25 = 1774;
+
+	//IC3
 	hx1.gpioSck = DO_SCK_1_GPIO_Port;
 	hx1.gpioData = DI_DATA_1_GPIO_Port;
 	hx1.pinSck = DO_SCK_1_Pin;
@@ -101,6 +113,7 @@ int main(void)
 	hx1.readingB = 0;
 	HX711_Init(hx1);
 
+	//IC2
 	hx2.gpioSck = DO_SCK_2_GPIO_Port;
 	hx2.gpioData = DI_DATA_2_GPIO_Port;
 	hx2.pinSck = DO_SCK_2_Pin;
@@ -113,7 +126,6 @@ int main(void)
 	HX711_Init(hx2);
 
 	iTare = 1;
-
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -123,7 +135,18 @@ int main(void)
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
+	  if(iDFU)
+	  {
+		HAL_GPIO_WritePin(DO_BOOT_SET_GPIO_Port, DO_BOOT_SET_Pin, GPIO_PIN_SET);
+		HAL_Delay(1000);
+		NVIC_SystemReset();
+	  }
 
+	  if (HAL_ADC_PollForConversion(&hadc1, 10) == HAL_OK)
+	  {
+		  temperature = HAL_ADC_GetValue(&hadc1);
+		  temperature = ((v25 - temperature)/Avg_Slope) + 25;
+	  }
 	  if (iTare)
 	  {
 		HX711_Average_Value(hx1, 100);
@@ -146,14 +169,14 @@ int main(void)
 	  {
 		  hx1.gain = 2;
 		  hx2.gain = 2;
-		  HX711_Average_Value(hx1, 2);
-		  HX711_Average_Value(hx2, 2);
+		  HX711_Average_Value(hx1, 1);
+		  HX711_Average_Value(hx2, 1);
 		  hx1.readingB = (HX711_Average_Value(hx1, 1) - hx1.offsetB)/10;
 		  hx2.readingB = (HX711_Average_Value(hx2, 1) - hx2.offsetB)/10;
 		  hx1.gain = 3;
 		  hx2.gain = 3;
-		  HX711_Average_Value(hx1, 2);
-		  HX711_Average_Value(hx2, 2);
+		  HX711_Average_Value(hx1, 1);
+		  HX711_Average_Value(hx2, 1);
 		  hx1.readingA = (HX711_Average_Value(hx1, 1) - hx1.offsetA)/20;
 		  hx2.readingA = (HX711_Average_Value(hx2, 1) - hx2.offsetA)/20;
 	  }
@@ -207,6 +230,47 @@ void SystemClock_Config(void)
 
   /* SysTick_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
+}
+
+/* ADC1 init function */
+static void MX_ADC1_Init(void)
+{
+
+  ADC_ChannelConfTypeDef sConfig;
+
+    /**Common config 
+    */
+  hadc1.Instance = ADC1;
+  hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV2;
+  hadc1.Init.Resolution = ADC_RESOLUTION_12B;
+  hadc1.Init.ScanConvMode = ADC_SCAN_DISABLE;
+  hadc1.Init.ContinuousConvMode = ENABLE;
+  hadc1.Init.DiscontinuousConvMode = DISABLE;
+  hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
+  hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
+  hadc1.Init.NbrOfConversion = 1;
+  hadc1.Init.DMAContinuousRequests = ENABLE;
+  hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
+  hadc1.Init.LowPowerAutoWait = DISABLE;
+  hadc1.Init.Overrun = ADC_OVR_DATA_OVERWRITTEN;
+  if (HAL_ADC_Init(&hadc1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+    /**Configure Regular Channel 
+    */
+  sConfig.Channel = ADC_CHANNEL_TEMPSENSOR;
+  sConfig.Rank = 1;
+  sConfig.SingleDiff = ADC_SINGLE_ENDED;
+  sConfig.SamplingTime = ADC_SAMPLETIME_4CYCLES_5;
+  sConfig.OffsetNumber = ADC_OFFSET_NONE;
+  sConfig.Offset = 0;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
 }
 
 /* CRC init function */
