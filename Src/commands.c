@@ -5,10 +5,111 @@ HX711 hx2;
 uint8_t command[30];
 uint16_t length = 0;
 uint8_t status = 0;
-uint8_t iCalibration = 0;
+uint8_t iCalibration = 87;
 uint8_t iTare = 0;
 uint16_t temperature = 0;
 uint8_t iDFU = 0;
+
+uint32_t startAddress = 0x8010000;//starting from 64KB
+
+void writeFlash(void)
+{
+    HAL_FLASH_Unlock();//unlock flash writing
+    HAL_FLASH_Program(FLASH_TYPEPROGRAM_HALFWORD, startAddress, iCalibration);
+    HAL_FLASH_Lock();//lock the flash for writing
+}
+
+void readFlash(void)
+{
+	iCalibration = *(uint16_t *)(startAddress);
+}
+
+void Move_Array(int* arr, int n)
+{
+	for(int i = 1; i < n; i++)
+	{
+		arr[i-1] = arr[i];
+	}
+}
+
+float mean(int m, int a[]) {
+    int sum=0, i;
+    for(i=0; i<m; i++)
+        sum+=a[i];
+    return((float)sum/m);
+}
+
+float median(int n, int* src) {
+    float temp;
+    int x[n];
+    memcpy(x, src, sizeof x);
+    int i, j;
+    // the following two loops sort the array x in ascending order
+    for(i=0; i<n-1; i++) {
+        for(j=i+1; j<n; j++) {
+            if(x[j] < x[i]) {
+                // swap elements
+                temp = x[i];
+                x[i] = x[j];
+                x[j] = temp;
+            }
+        }
+    }
+
+    if(n%2==0) {
+        // if there is an even number of elements, return mean of the two elements in the middle
+        return((x[n/2] + x[n/2 - 1]) / 2.0);
+    } else {
+        // else return the element in the middle
+        return x[n/2];
+    }
+}
+
+void HX711_Process_Values()
+{
+
+	if(hx1.readingA < 0)
+	{
+		hx1.readingA = 0;
+	}
+
+	if(hx1.readingB < 0)
+	{
+		hx1.readingB = 0;
+	}
+
+	if(hx2.readingA < 0)
+	{
+		hx2.readingA = 0;
+	}
+
+	if(hx2.readingB < 0)
+	{
+		hx2.readingB = 0;
+	}
+
+	Move_Array(hx1.historyA, FLT);
+	Move_Array(hx1.historyB, FLT);
+	Move_Array(hx2.historyA, FLT);
+	Move_Array(hx2.historyB, FLT);
+	hx1.historyA[FLT-1] = hx1.readingA;
+	hx1.historyB[FLT-1] = hx1.readingB;
+	hx2.historyA[FLT-1] = hx2.readingA;
+	hx2.historyB[FLT-1] = hx2.readingB;
+
+	hx1.valueA = median(FLT, hx1.historyA);
+	hx1.valueB = median(FLT, hx1.historyB);
+	hx2.valueA = median(FLT, hx2.historyA);
+	hx2.valueB = median(FLT, hx2.historyB);
+
+	if(hx1.valueA < 10 || hx2.valueA < 10 || hx1.valueB < 10 || hx2.valueB < 10)
+	{
+		hx1.valueA = 0;
+		hx2.valueA = 0;
+		hx1.valueB = 0;
+		hx2.valueB = 0;
+	}
+}
 
 void Commands_BufferHandle(uint8_t* Buf, uint32_t *Len)
 {
@@ -71,17 +172,30 @@ void Commands_Parse(uint8_t* buf, uint8_t len)
 	}
 	else if(_cmd_check(buf, len, "val", 3))
 	{
-	  offset += sprintf(&msg[offset], ":%03X", hx1.readingA);
-	  offset += sprintf(&msg[offset], ":%03X", hx1.readingB);
-	  offset += sprintf(&msg[offset], ":%03X", hx2.readingA);
-	  offset += sprintf(&msg[offset], ":%03X", hx2.readingB);
-	  offset += sprintf(&msg[offset], ":%03X", temperature);
+	  offset += sprintf(&msg[offset], ":%03d", hx1.valueA);
+	  offset += sprintf(&msg[offset], ":%03d", hx1.valueB);
+	  offset += sprintf(&msg[offset], ":%03d", hx2.valueA);
+	  offset += sprintf(&msg[offset], ":%03d", hx2.valueB);
+	  offset += sprintf(&msg[offset], ":%03d", temperature);
 
 	  msg[offset++] = '\n';
 	  CDC_Transmit_FS(msg, offset);
 	} else if(_cmd_check(buf, len, "cal", 3))
 	{
-	  memcpy(&msg[offset], "OK", 2);
+
+	  char num[] = {buf[4], buf[5]};
+	  int param = strtol(num, NULL, 10);
+
+	  if(param > 30 && param < 100)
+	  {
+		  iCalibration = param;
+		  writeFlash();
+		  memcpy(&msg[offset], "OK", 2);
+	  }
+	  else
+	  {
+		  memcpy(&msg[offset], "ER", 2);
+	  }
 	  offset += 2;
 	  msg[offset++] = '\n';
 

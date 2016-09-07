@@ -101,6 +101,8 @@ int main(void)
 	float Avg_Slope = ((float)(ts_cal1 - ts_cal2)) / (110 - 30);
 	uint16_t v25 = 1774;
 
+	int empty[] = {0,0,0,0,0,0,0,0,0,0};
+
 	//IC3
 	hx1.gpioSck = DO_SCK_1_GPIO_Port;
 	hx1.gpioData = DI_DATA_1_GPIO_Port;
@@ -111,6 +113,8 @@ int main(void)
 	hx1.offsetB = 0;
 	hx1.readingA = 0;
 	hx1.readingB = 0;
+	memcpy(hx1.historyA, empty, sizeof hx1.historyA);
+	memcpy(hx1.historyB, empty, sizeof hx1.historyB);
 	HX711_Init(hx1);
 
 	//IC2
@@ -123,7 +127,10 @@ int main(void)
 	hx2.offsetB = 0;
 	hx2.readingA = 0;
 	hx2.readingB = 0;
+	memcpy(hx2.historyA, empty, sizeof hx2.historyA);
+	memcpy(hx2.historyB, empty, sizeof hx2.historyB);
 	HX711_Init(hx2);
+	readFlash();
 
 	iTare = 1;
   /* USER CODE END 2 */
@@ -171,14 +178,16 @@ int main(void)
 		  hx2.gain = 2;
 		  HX711_Average_Value(hx1, 1);
 		  HX711_Average_Value(hx2, 1);
-		  hx1.readingB = (HX711_Average_Value(hx1, 1) - hx1.offsetB)/10;
-		  hx2.readingB = (HX711_Average_Value(hx2, 1) - hx2.offsetB)/10;
+		  hx1.readingB = (-(HX711_Average_Value(hx1, 2) - hx1.offsetB) * ((float)iCalibration/100))/1000;
+		  hx2.readingB = (-(HX711_Average_Value(hx2, 2) - hx2.offsetB) * ((float)iCalibration/100))/1000;
 		  hx1.gain = 3;
 		  hx2.gain = 3;
 		  HX711_Average_Value(hx1, 1);
 		  HX711_Average_Value(hx2, 1);
-		  hx1.readingA = (HX711_Average_Value(hx1, 1) - hx1.offsetA)/20;
-		  hx2.readingA = (HX711_Average_Value(hx2, 1) - hx2.offsetA)/20;
+		  hx1.readingA = (-(HX711_Average_Value(hx1, 2) - hx1.offsetA) * ((float)iCalibration/100))/2000;
+		  hx2.readingA = (-(HX711_Average_Value(hx2, 2) - hx2.offsetA) * ((float)iCalibration/100))/2000;
+		  HX711_Process_Values();
+
 	  }
 	  HAL_GPIO_TogglePin(DO_LED_1_GPIO_Port, DO_LED_1_Pin);
   }
