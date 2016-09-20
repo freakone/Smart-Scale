@@ -149,11 +149,11 @@ int main(void)
 		NVIC_SystemReset();
 	  }
 
-	  if (HAL_ADC_PollForConversion(&hadc1, 10) == HAL_OK)
-	  {
-		  temperature = HAL_ADC_GetValue(&hadc1);
-		  temperature = ((v25 - temperature)/Avg_Slope) + 25;
-	  }
+//	  if (HAL_ADC_PollForConversion(&hadc1, 10) == HAL_OK)
+//	  {
+//		  temperature = HAL_ADC_GetValue(&hadc1);
+//		  temperature = ((v25 - temperature)/Avg_Slope) + 25;
+//	  }
 	  if (iTare)
 	  {
 		HX711_Average_Value(hx1, 100);
@@ -190,6 +190,7 @@ int main(void)
 
 	  }
 	  HAL_GPIO_TogglePin(DO_LED_1_GPIO_Port, DO_LED_1_Pin);
+
   }
   /* USER CODE END 3 */
 

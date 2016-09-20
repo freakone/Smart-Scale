@@ -14,9 +14,11 @@ uint32_t startAddress = 0x8010000;//starting from 64KB
 
 void writeFlash(void)
 {
-    HAL_FLASH_Unlock();//unlock flash writing
+    HAL_FLASH_Unlock();
+    FLASH_PageErase(startAddress);
+    CLEAR_BIT(FLASH->CR, FLASH_CR_PER);
     HAL_FLASH_Program(FLASH_TYPEPROGRAM_HALFWORD, startAddress, iCalibration);
-    HAL_FLASH_Lock();//lock the flash for writing
+    HAL_FLASH_Lock();
 }
 
 void readFlash(void)
@@ -176,7 +178,7 @@ void Commands_Parse(uint8_t* buf, uint8_t len)
 	  offset += sprintf(&msg[offset], ":%03d", hx1.valueB);
 	  offset += sprintf(&msg[offset], ":%03d", hx2.valueA);
 	  offset += sprintf(&msg[offset], ":%03d", hx2.valueB);
-	  offset += sprintf(&msg[offset], ":%03d", temperature);
+//	  offset += sprintf(&msg[offset], ":%03d", temperature);
 
 	  msg[offset++] = '\n';
 	  CDC_Transmit_FS(msg, offset);
