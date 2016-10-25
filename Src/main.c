@@ -41,8 +41,6 @@
 /* Private variables ---------------------------------------------------------*/
 ADC_HandleTypeDef hadc1;
 
-CRC_HandleTypeDef hcrc;
-
 TIM_HandleTypeDef htim15;
 
 /* USER CODE BEGIN PV */
@@ -54,7 +52,6 @@ TIM_HandleTypeDef htim15;
 void SystemClock_Config(void);
 void Error_Handler(void);
 static void MX_GPIO_Init(void);
-static void MX_CRC_Init(void);
 static void MX_TIM15_Init(void);
 static void MX_ADC1_Init(void);
 
@@ -87,19 +84,13 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_CRC_Init();
+  HAL_Delay(1000);
   MX_USB_DEVICE_Init();
   MX_TIM15_Init();
   MX_ADC1_Init();
 
   /* USER CODE BEGIN 2 */
 	HAL_TIM_PWM_Start(&htim15, TIM_CHANNEL_2);
-	HAL_ADC_Start(&hadc1);
-
-	uint16_t ts_cal1 = *((uint16_t*)0x1FFFF7B8);
-	uint16_t ts_cal2 = *((uint16_t*)0x1FFFF7C2);
-	float Avg_Slope = ((float)(ts_cal1 - ts_cal2)) / (110 - 30);
-	uint16_t v25 = 1774;
 
 	int empty[] = {0,0,0,0,0,0,0,0,0,0};
 
@@ -149,11 +140,6 @@ int main(void)
 		NVIC_SystemReset();
 	  }
 
-//	  if (HAL_ADC_PollForConversion(&hadc1, 10) == HAL_OK)
-//	  {
-//		  temperature = HAL_ADC_GetValue(&hadc1);
-//		  temperature = ((v25 - temperature)/Avg_Slope) + 25;
-//	  }
 	  if (iTare)
 	  {
 		HX711_Average_Value(hx1, 100);
@@ -189,6 +175,7 @@ int main(void)
 		  HX711_Process_Values();
 
 	  }
+
 	  HAL_GPIO_TogglePin(DO_LED_1_GPIO_Port, DO_LED_1_Pin);
 
   }
@@ -208,6 +195,7 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
   RCC_OscInitStruct.HSEPredivValue = RCC_HSE_PREDIV_DIV1;
+  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
   RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL6;
@@ -283,30 +271,13 @@ static void MX_ADC1_Init(void)
 
 }
 
-/* CRC init function */
-static void MX_CRC_Init(void)
-{
-
-  hcrc.Instance = CRC;
-  hcrc.Init.DefaultPolynomialUse = DEFAULT_POLYNOMIAL_ENABLE;
-  hcrc.Init.DefaultInitValueUse = DEFAULT_INIT_VALUE_ENABLE;
-  hcrc.Init.InputDataInversionMode = CRC_INPUTDATA_INVERSION_NONE;
-  hcrc.Init.OutputDataInversionMode = CRC_OUTPUTDATA_INVERSION_DISABLE;
-  hcrc.InputDataFormat = CRC_INPUTDATA_FORMAT_BYTES;
-  if (HAL_CRC_Init(&hcrc) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-}
-
 /* TIM15 init function */
 static void MX_TIM15_Init(void)
 {
 
   TIM_MasterConfigTypeDef sMasterConfig;
-  TIM_BreakDeadTimeConfigTypeDef sBreakDeadTimeConfig;
   TIM_OC_InitTypeDef sConfigOC;
+  TIM_BreakDeadTimeConfigTypeDef sBreakDeadTimeConfig;
 
   htim15.Instance = TIM15;
   htim15.Init.Prescaler = 30000;
@@ -326,18 +297,6 @@ static void MX_TIM15_Init(void)
     Error_Handler();
   }
 
-  sBreakDeadTimeConfig.OffStateIDLEMode = TIM_OSSI_DISABLE;
-  sBreakDeadTimeConfig.LockLevel = TIM_LOCKLEVEL_OFF;
-  sBreakDeadTimeConfig.DeadTime = 0;
-  sBreakDeadTimeConfig.BreakState = TIM_BREAK_DISABLE;
-  sBreakDeadTimeConfig.BreakPolarity = TIM_BREAKPOLARITY_HIGH;
-  sBreakDeadTimeConfig.BreakFilter = 0;
-  sBreakDeadTimeConfig.AutomaticOutput = TIM_AUTOMATICOUTPUT_DISABLE;
-  if (HAL_TIMEx_ConfigBreakDeadTime(&htim15, &sBreakDeadTimeConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
   sConfigOC.OCMode = TIM_OCMODE_PWM1;
   sConfigOC.Pulse = 100;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
@@ -346,6 +305,18 @@ static void MX_TIM15_Init(void)
   sConfigOC.OCIdleState = TIM_OCIDLESTATE_RESET;
   sConfigOC.OCNIdleState = TIM_OCNIDLESTATE_RESET;
   if (HAL_TIM_PWM_ConfigChannel(&htim15, &sConfigOC, TIM_CHANNEL_2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  sBreakDeadTimeConfig.OffStateIDLEMode = TIM_OSSI_DISABLE;
+  sBreakDeadTimeConfig.LockLevel = TIM_LOCKLEVEL_OFF;
+  sBreakDeadTimeConfig.DeadTime = 0;
+  sBreakDeadTimeConfig.BreakState = TIM_BREAK_DISABLE;
+  sBreakDeadTimeConfig.BreakPolarity = TIM_BREAKPOLARITY_HIGH;
+  sBreakDeadTimeConfig.BreakFilter = 0;
+  sBreakDeadTimeConfig.AutomaticOutput = TIM_AUTOMATICOUTPUT_DISABLE;
+  if (HAL_TIMEx_ConfigBreakDeadTime(&htim15, &sBreakDeadTimeConfig) != HAL_OK)
   {
     Error_Handler();
   }

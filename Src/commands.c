@@ -104,11 +104,23 @@ void HX711_Process_Values()
 	hx2.valueA = median(FLT, hx2.historyA);
 	hx2.valueB = median(FLT, hx2.historyB);
 
-	if(hx1.valueA < 10 || hx2.valueA < 10 || hx1.valueB < 10 || hx2.valueB < 10)
+	if(hx1.valueA < 6)
 	{
 		hx1.valueA = 0;
-		hx2.valueA = 0;
+	}
+
+	if(hx1.valueB < 6)
+	{
 		hx1.valueB = 0;
+	}
+
+	if(hx2.valueA < 6)
+	{
+		hx2.valueA = 0;
+	}
+
+	if(hx2.valueB < 6)
+	{
 		hx2.valueB = 0;
 	}
 }
@@ -138,7 +150,7 @@ void Commands_BufferHandle(uint8_t* Buf, uint32_t *Len)
 
 }
 
-uint8_t _cmd_check(uint8_t* buf, uint8_t bufsize, uint8_t* cmd, uint8_t cmdsize)
+uint8_t _cmd_check(uint8_t* buf, uint8_t bufsize, int8_t* cmd, uint8_t cmdsize)
 {
 	if(cmdsize >= bufsize)
 	{
@@ -158,13 +170,13 @@ uint8_t _cmd_check(uint8_t* buf, uint8_t bufsize, uint8_t* cmd, uint8_t cmdsize)
 
 void Commands_Parse(uint8_t* buf, uint8_t len)
 {
-	uint8_t msg[30];
+	char msg[30];
 	msg[0] = '|';
 	uint16_t offset = 1;
 
 	if(_cmd_check(buf, len, "id", 2))
 	{
-	  unsigned long *id = (unsigned long *)0x1FFFF7AC;
+	  unsigned int *id = (unsigned int *)0x1FFFF7AC;
 	  for( int i = 0; i < 3; i++)
 	  {
 		  offset += sprintf(&msg[offset], "%08X", id[i]);
