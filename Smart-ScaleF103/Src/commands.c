@@ -18,10 +18,11 @@ uint8_t iTare = 0;
 uint16_t temperature = 0;
 uint8_t iDFU = 0;
 
-uint32_t startAddress = 0x8010000;//starting from 64KB
+uint32_t startAddress = 0x800FC00;//starting from 1KB before flash ends = 63KB
 
 void writeFlash(void)
 {
+
     HAL_FLASH_Unlock();
     FLASH_PageErase(startAddress);
     CLEAR_BIT(FLASH->CR, FLASH_CR_PER);
