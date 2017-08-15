@@ -1,8 +1,16 @@
 #include "commands.h"
 
+#include <stdlib.h>
+#include <string.h>
+#include <stdint.h>
+#include "stm32f1xx_hal.h"
+#include "stm32f1xx_hal_flash.h"
+#include "math.h"
+#include "usbd_cdc_if.h"
+
 HX711 hx1;
 HX711 hx2;
-uint8_t command[30];
+char command[30];
 uint16_t length = 0;
 uint8_t status = 0;
 uint8_t iCalibration = 87;
@@ -150,7 +158,7 @@ void Commands_BufferHandle(uint8_t* Buf, uint32_t *Len)
 
 }
 
-uint8_t _cmd_check(uint8_t* buf, uint8_t bufsize, int8_t* cmd, uint8_t cmdsize)
+uint8_t _cmd_check(char* buf, uint8_t bufsize, char* cmd, uint8_t cmdsize)
 {
 	if(cmdsize >= bufsize)
 	{
@@ -168,9 +176,9 @@ uint8_t _cmd_check(uint8_t* buf, uint8_t bufsize, int8_t* cmd, uint8_t cmdsize)
 	return 1;
 }
 
-void Commands_Parse(uint8_t* buf, uint8_t len)
+void Commands_Parse(char* buf, uint8_t len)
 {
-	char msg[30];
+	uint8_t msg[30];
 	msg[0] = '|';
 	uint16_t offset = 1;
 
