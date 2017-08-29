@@ -151,6 +151,7 @@ int main(void)
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
+
 	  if(iDFU)
 	  {
 		HAL_GPIO_WritePin(DO_BOOT_SET_GPIO_Port, DO_BOOT_SET_Pin, GPIO_PIN_SET);

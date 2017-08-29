@@ -185,7 +185,7 @@ void Commands_Parse(char* buf, uint8_t len)
 
 	if(_cmd_check(buf, len, "id", 2))
 	{
-	  unsigned int *id = (unsigned int *)0x1FFFF7AC;
+	  unsigned int *id = (unsigned int *)0x1FFFF7E8;
 	  for( int i = 0; i < 3; i++)
 	  {
 		  offset += sprintf(&msg[offset], "%08X", id[i]);
