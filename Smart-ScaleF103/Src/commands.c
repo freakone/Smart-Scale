@@ -195,10 +195,11 @@ void Commands_Parse(char* buf, uint8_t len)
 	}
 	else if(_cmd_check(buf, len, "val", 3))
 	{
-	  offset += sprintf(&msg[offset], ":%03d", hx1.valueA);
-	  offset += sprintf(&msg[offset], ":%03d", hx1.valueB);
-	  offset += sprintf(&msg[offset], ":%03d", hx2.valueA);
+		//wrong PCB naming
 	  offset += sprintf(&msg[offset], ":%03d", hx2.valueB);
+	  offset += sprintf(&msg[offset], ":%03d", hx2.valueA);
+	  offset += sprintf(&msg[offset], ":%03d", hx1.valueB);
+	  offset += sprintf(&msg[offset], ":%03d", hx1.valueA);
 //	  offset += sprintf(&msg[offset], ":%03d", temperature);
 
 	  msg[offset++] = '\n';
