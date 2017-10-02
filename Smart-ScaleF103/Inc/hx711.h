@@ -18,6 +18,8 @@ typedef struct _hx711
 	int valueB;
 	int historyA[FLT];
 	int historyB[FLT];
+	int tareA[FLT];
+	int tareB[FLT];
 	int offset;
 	int gain;
 	// 1: channel A, gain factor 128

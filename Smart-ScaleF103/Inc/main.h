@@ -60,20 +60,10 @@
 #define DO_SCK_1_GPIO_Port GPIOA
 #define DI_DATA_1_Pin GPIO_PIN_2
 #define DI_DATA_1_GPIO_Port GPIOA
-#define SPI_CS_Pin GPIO_PIN_12
-#define SPI_CS_GPIO_Port GPIOB
-#define DO_LED_1_Pin GPIO_PIN_13
-#define DO_LED_1_GPIO_Port GPIOB
 #define DO_SCK_2_Pin GPIO_PIN_14
 #define DO_SCK_2_GPIO_Port GPIOB
 #define DI_DATA_2_Pin GPIO_PIN_8
 #define DI_DATA_2_GPIO_Port GPIOA
-#define DO_LED_2_Pin GPIO_PIN_9
-#define DO_LED_2_GPIO_Port GPIOA
-#define DO_USBPWREN_Pin GPIO_PIN_15
-#define DO_USBPWREN_GPIO_Port GPIOA
-#define DO_BOOT_SET_Pin GPIO_PIN_7
-#define DO_BOOT_SET_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 
