@@ -17,6 +17,7 @@ uint8_t iCalibration = 87;
 uint8_t iTare = 0;
 uint16_t temperature = 0;
 uint8_t iDFU = 0;
+uint16_t iTareTime = 0;
 
 uint32_t startAddress = 0x800FC00;//starting from 1KB before flash ends = 63KB
 
@@ -78,27 +79,6 @@ float median(int n, int* src) {
 
 void HX711_Process_Values()
 {
-
-	if(hx1.readingA < 0)
-	{
-		hx1.readingA = 0;
-	}
-
-	if(hx1.readingB < 0)
-	{
-		hx1.readingB = 0;
-	}
-
-	if(hx2.readingA < 0)
-	{
-		hx2.readingA = 0;
-	}
-
-	if(hx2.readingB < 0)
-	{
-		hx2.readingB = 0;
-	}
-
 	Move_Array(hx1.historyA, FLT);
 	Move_Array(hx1.historyB, FLT);
 	Move_Array(hx2.historyA, FLT);
@@ -113,25 +93,6 @@ void HX711_Process_Values()
 	hx2.valueA = median(FLT, hx2.historyA);
 	hx2.valueB = median(FLT, hx2.historyB);
 
-	if(hx1.valueA < 6)
-	{
-		hx1.valueA = 0;
-	}
-
-	if(hx1.valueB < 6)
-	{
-		hx1.valueB = 0;
-	}
-
-	if(hx2.valueA < 6)
-	{
-		hx2.valueA = 0;
-	}
-
-	if(hx2.valueB < 6)
-	{
-		hx2.valueB = 0;
-	}
 }
 
 void Commands_BufferHandle(uint8_t* Buf, uint32_t *Len)
@@ -196,11 +157,10 @@ void Commands_Parse(char* buf, uint8_t len)
 	else if(_cmd_check(buf, len, "val", 3))
 	{
 		//wrong PCB naming
-	  offset += sprintf(&msg[offset], ":%03d", hx2.valueB);
-	  offset += sprintf(&msg[offset], ":%03d", hx2.valueA);
-	  offset += sprintf(&msg[offset], ":%03d", hx1.valueB);
-	  offset += sprintf(&msg[offset], ":%03d", hx1.valueA);
-//	  offset += sprintf(&msg[offset], ":%03d", temperature);
+	  offset += sprintf(&msg[offset], ":%03X", hx2.valueB);
+	  offset += sprintf(&msg[offset], ":%03X", hx2.valueA);
+	  offset += sprintf(&msg[offset], ":%03X", hx1.valueB);
+	  offset += sprintf(&msg[offset], ":%03X", hx1.valueA);
 
 	  msg[offset++] = '\n';
 	  CDC_Transmit_FS(msg, offset);

@@ -49,6 +49,7 @@
 #include "main.h"
 #include "stm32f1xx_hal.h"
 #include "usb_device.h"
+#include <math.h>
 
 /* USER CODE BEGIN Includes */
 #include "commands.h"
@@ -119,8 +120,6 @@ int main(void)
 	hx1.readingB = 0;
 	memcpy(hx1.historyA, empty, sizeof hx1.historyA);
 	memcpy(hx1.historyB, empty, sizeof hx1.historyB);
-	memcpy(hx1.tareA, empty, sizeof hx1.tareA);
-	memcpy(hx1.tareB, empty, sizeof hx1.tareB);
 	HX711_Init(hx1);
 
 	//IC2
@@ -135,8 +134,6 @@ int main(void)
 	hx2.readingB = 0;
 	memcpy(hx2.historyA, empty, sizeof hx2.historyA);
 	memcpy(hx2.historyB, empty, sizeof hx2.historyB);
-	memcpy(hx2.tareA, empty, sizeof hx2.tareA);
-	memcpy(hx2.tareB, empty, sizeof hx2.tareB);
 	HX711_Init(hx2);
 	readFlash();
 
@@ -153,7 +150,6 @@ int main(void)
 
 	  if(iDFU)
 	  {
-//		HAL_GPIO_WritePin(DO_BOOT_SET_GPIO_Port, DO_BOOT_SET_Pin, GPIO_PIN_SET);
 		HAL_Delay(1000);
 		NVIC_SystemReset();
 	  }
@@ -178,28 +174,21 @@ int main(void)
 	  }
 	  else
 	  {
-		  Move_Array(hx1.tareA, FLT);
-		  Move_Array(hx1.tareB, FLT);
-		  Move_Array(hx2.tareA, FLT);
-		  Move_Array(hx2.tareB, FLT);
-
 		  hx1.gain = 2;
 		  hx2.gain = 2;
-		  hx1.tareB[FLT-1] = HX711_Average_Value(hx1, 1);
-		  hx2.tareB[FLT-1] = HX711_Average_Value(hx2, 1);
+		  HX711_Average_Value(hx1, 2);
+		  HX711_Average_Value(hx2, 2);
 		  hx1.readingB = (-(HX711_Average_Value(hx1, 2) - hx1.offsetB) * ((float)iCalibration/100))/1000;
 		  hx2.readingB = (-(HX711_Average_Value(hx2, 2) - hx2.offsetB) * ((float)iCalibration/100))/1000;
 		  hx1.gain = 3;
 		  hx2.gain = 3;
-		  hx1.tareA[FLT-1] = HX711_Average_Value(hx1, 1);
-		  hx2.tareA[FLT-1] = HX711_Average_Value(hx2, 1);
+		  HX711_Average_Value(hx1, 2);
+		  HX711_Average_Value(hx2, 2);
 		  hx1.readingA = (-(HX711_Average_Value(hx1, 2) - hx1.offsetA) * ((float)iCalibration/100))/2000;
 		  hx2.readingA = (-(HX711_Average_Value(hx2, 2) - hx2.offsetA) * ((float)iCalibration/100))/2000;
 		  HX711_Process_Values();
-
 	  }
 
-	 // HAL_GPIO_TogglePin(DO_LED_1_GPIO_Port, DO_LED_1_Pin);
 
   }
   /* USER CODE END 3 */

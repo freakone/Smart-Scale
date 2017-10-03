@@ -16,6 +16,7 @@ extern uint8_t iCalibration;
 extern uint8_t iTare;
 extern uint16_t temperature;
 extern uint8_t iDFU;
+extern uint16_t iTareTime;
 void Commands_BufferHandle(uint8_t* Buf, uint32_t *Len);
 void Commands_Parse(char* buf, uint8_t len);
 uint8_t _cmd_check(char* buf, uint8_t bufsize, char* cmd, uint8_t cmdsize);

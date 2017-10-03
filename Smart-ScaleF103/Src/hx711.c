@@ -21,9 +21,9 @@ void HX711_Init(HX711 data)
 
 }
 
-int HX711_Average_Value(HX711 data, uint8_t times)
+long HX711_Average_Value(HX711 data, uint8_t times)
 {
-    int sum = 0;
+    long sum = 0;
     for (int i = 0; i < times; i++)
     {
         sum += HX711_Value(data);
@@ -32,10 +32,11 @@ int HX711_Average_Value(HX711 data, uint8_t times)
     return sum / times;
 }
 
-int HX711_Value(HX711 data)
+long HX711_Value(HX711 data)
 {
-    int buffer;
-    buffer = 0;
+    uint32_t buffer = 0;
+    uint32_t filler = 0;
+    unsigned long value = 0;
 
     while (HAL_GPIO_ReadPin(data.gpioData, data.pinData)==1)
     ;
@@ -43,15 +44,14 @@ int HX711_Value(HX711 data)
     for (uint8_t i = 0; i < 24; i++)
     {
     	HAL_GPIO_WritePin(data.gpioSck, data.pinSck, GPIO_PIN_SET);
+    	HAL_GPIO_WritePin(data.gpioSck, data.pinSck, GPIO_PIN_RESET);
 
         buffer = buffer << 1 ;
 
-        if (HAL_GPIO_ReadPin(data.gpioData, data.pinData))
+        if (HAL_GPIO_ReadPin(data.gpioData, data.pinData) == GPIO_PIN_SET)
         {
-            buffer ++;
+            buffer++;
         }
-
-        HAL_GPIO_WritePin(data.gpioSck, data.pinSck, GPIO_PIN_RESET);
     }
 
     for (int i = 0; i < data.gain; i++)
@@ -60,9 +60,16 @@ int HX711_Value(HX711 data)
     	HAL_GPIO_WritePin(data.gpioSck, data.pinSck, GPIO_PIN_RESET);
     }
 
-    buffer = buffer ^ 0x800000;
+    if ( buffer & 0x800000 ) {
+           filler = 0xFF000000;
+       } else {
+           filler = 0x00000000;
+       }
 
-    return buffer;
+    value = buffer | filler;
+    value++;
+    // ... and add 1
+    return (long)value;
 }
 
 HX711 HX711_Tare(HX711 data, uint8_t times)
