@@ -49,7 +49,6 @@
 #include "main.h"
 #include "stm32f1xx_hal.h"
 #include "usb_device.h"
-#include <math.h>
 
 /* USER CODE BEGIN Includes */
 #include "commands.h"

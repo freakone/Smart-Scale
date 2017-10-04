@@ -93,6 +93,10 @@ void HX711_Process_Values()
 	hx2.valueA = median(FLT, hx2.historyA);
 	hx2.valueB = median(FLT, hx2.historyB);
 
+	if(hx1.valueA < 0) hx1.valueA = 0;
+	if(hx1.valueB < 0) hx1.valueB = 0;
+	if(hx2.valueA < 0) hx2.valueA = 0;
+	if(hx2.valueB < 0) hx2.valueB = 0;
 }
 
 void Commands_BufferHandle(uint8_t* Buf, uint32_t *Len)
@@ -157,10 +161,10 @@ void Commands_Parse(char* buf, uint8_t len)
 	else if(_cmd_check(buf, len, "val", 3))
 	{
 		//wrong PCB naming
-	  offset += sprintf(&msg[offset], ":%03X", hx2.valueB);
-	  offset += sprintf(&msg[offset], ":%03X", hx2.valueA);
-	  offset += sprintf(&msg[offset], ":%03X", hx1.valueB);
-	  offset += sprintf(&msg[offset], ":%03X", hx1.valueA);
+	  offset += sprintf(&msg[offset], ":%03d", hx2.valueB);
+	  offset += sprintf(&msg[offset], ":%03d", hx2.valueA);
+	  offset += sprintf(&msg[offset], ":%03d", hx1.valueB);
+	  offset += sprintf(&msg[offset], ":%03d", hx1.valueA);
 
 	  msg[offset++] = '\n';
 	  CDC_Transmit_FS(msg, offset);
