@@ -104,6 +104,12 @@ int main(void)
 
   /* USER CODE BEGIN 2 */
 	//HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
+//  	HAL_ADC_Start(&hadc1);
+
+//  	uint16_t ts_cal1 = *((uint16_t*)0x1FFFF7B8);
+//  	uint16_t ts_cal2 = *((uint16_t*)0x1FFFF7C2);
+//  	float Avg_Slope = ((float)(ts_cal1 - ts_cal2)) / (110 - 30);
+//  	uint16_t v25 = 1774;
 
 	int empty[] = {0,0,0,0,0,0,0,0,0,0};
 
@@ -119,6 +125,8 @@ int main(void)
 	hx1.readingB = 0;
 	memcpy(hx1.historyA, empty, sizeof hx1.historyA);
 	memcpy(hx1.historyB, empty, sizeof hx1.historyB);
+	memcpy(hx1.historyMeanA, empty, sizeof hx1.historyMeanA);
+	memcpy(hx1.historyMeanB, empty, sizeof hx1.historyMeanB);
 	HX711_Init(hx1);
 
 	//IC2
@@ -133,6 +141,8 @@ int main(void)
 	hx2.readingB = 0;
 	memcpy(hx2.historyA, empty, sizeof hx2.historyA);
 	memcpy(hx2.historyB, empty, sizeof hx2.historyB);
+	memcpy(hx2.historyMeanA, empty, sizeof hx2.historyMeanA);
+	memcpy(hx2.historyMeanB, empty, sizeof hx2.historyMeanB);
 	HX711_Init(hx2);
 	readFlash();
 
@@ -152,6 +162,12 @@ int main(void)
 		HAL_Delay(1000);
 		NVIC_SystemReset();
 	  }
+
+//	  if (HAL_ADC_PollForConversion(&hadc1, 10) == HAL_OK)
+//	  {
+//		  temperature = HAL_ADC_GetValue(&hadc1);
+//		  temperature = ((v25 - temperature)/Avg_Slope) + 25;
+//	  }
 
 	  if (iTare)
 	  {
@@ -173,19 +189,29 @@ int main(void)
 	  }
 	  else
 	  {
+		  HAL_GPIO_WritePin(hx1.gpioSck, hx1.pinSck, GPIO_PIN_RESET);
+		  HAL_GPIO_WritePin(hx2.gpioSck, hx2.pinSck, GPIO_PIN_RESET);
+		  HAL_Delay(20);
+
 		  hx1.gain = 2;
 		  hx2.gain = 2;
-		  HX711_Average_Value(hx1, 2);
-		  HX711_Average_Value(hx2, 2);
+		  HX711_Average_Value(hx1, 1);
+		  HX711_Average_Value(hx2, 1);
 		  hx1.readingB = (-(HX711_Average_Value(hx1, 2) - hx1.offsetB) * ((float)iCalibration/100))/1000;
 		  hx2.readingB = (-(HX711_Average_Value(hx2, 2) - hx2.offsetB) * ((float)iCalibration/100))/1000;
 		  hx1.gain = 3;
 		  hx2.gain = 3;
-		  HX711_Average_Value(hx1, 2);
-		  HX711_Average_Value(hx2, 2);
+		  HX711_Average_Value(hx1, 1);
+		  HX711_Average_Value(hx2, 1);
 		  hx1.readingA = (-(HX711_Average_Value(hx1, 2) - hx1.offsetA) * ((float)iCalibration/100))/2000;
 		  hx2.readingA = (-(HX711_Average_Value(hx2, 2) - hx2.offsetA) * ((float)iCalibration/100))/2000;
 		  HX711_Process_Values();
+
+		  HAL_GPIO_WritePin(hx1.gpioSck, hx1.pinSck, GPIO_PIN_RESET);
+		  HAL_GPIO_WritePin(hx1.gpioSck, hx1.pinSck, GPIO_PIN_SET);
+		  HAL_GPIO_WritePin(hx2.gpioSck, hx2.pinSck, GPIO_PIN_RESET);
+		  HAL_GPIO_WritePin(hx2.gpioSck, hx2.pinSck, GPIO_PIN_SET);
+		  HAL_Delay(20);
 	  }
 
 
@@ -226,7 +252,7 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_1) != HAL_OK)
   {
     _Error_Handler(__FILE__, __LINE__);
   }

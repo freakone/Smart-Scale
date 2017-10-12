@@ -69,6 +69,7 @@ long HX711_Value(HX711 data)
     value = buffer | filler;
     value++;
     // ... and add 1
+
     return (long)value;
 }
 

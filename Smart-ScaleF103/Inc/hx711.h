@@ -4,6 +4,7 @@
 #include "stm32f1xx_hal.h"
 #define FLT 5
 
+
 typedef struct _hx711
 {
 	GPIO_TypeDef* gpioSck;
@@ -18,6 +19,8 @@ typedef struct _hx711
 	long valueB;
 	int historyA[FLT];
 	int historyB[FLT];
+	int historyMeanA[FLT];
+	int historyMeanB[FLT];
 	int offset;
 	int gain;
 	// 1: channel A, gain factor 128

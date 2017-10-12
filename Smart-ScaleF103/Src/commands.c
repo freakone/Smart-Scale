@@ -83,20 +83,40 @@ void HX711_Process_Values()
 	Move_Array(hx1.historyB, FLT);
 	Move_Array(hx2.historyA, FLT);
 	Move_Array(hx2.historyB, FLT);
+	Move_Array(hx1.historyMeanA, FLT);
+	Move_Array(hx1.historyMeanB, FLT);
+	Move_Array(hx2.historyMeanA, FLT);
+	Move_Array(hx2.historyMeanB, FLT);
+
 	hx1.historyA[FLT-1] = hx1.readingA;
 	hx1.historyB[FLT-1] = hx1.readingB;
 	hx2.historyA[FLT-1] = hx2.readingA;
 	hx2.historyB[FLT-1] = hx2.readingB;
 
-	hx1.valueA = median(FLT, hx1.historyA);
-	hx1.valueB = median(FLT, hx1.historyB);
-	hx2.valueA = median(FLT, hx2.historyA);
-	hx2.valueB = median(FLT, hx2.historyB);
+//	hx1.valueA = median(FLT, hx1.historyA);
+//	hx1.valueB = median(FLT, hx1.historyB);
+//	hx2.valueA = median(FLT, hx2.historyA);
+//	hx2.valueB = median(FLT, hx2.historyB);
 
-	if(hx1.valueA < 0) hx1.valueA = 0;
-	if(hx1.valueB < 0) hx1.valueB = 0;
-	if(hx2.valueA < 0) hx2.valueA = 0;
-	if(hx2.valueB < 0) hx2.valueB = 0;
+	hx1.historyMeanA[FLT-1] = median(FLT, hx1.historyA);
+	hx1.historyMeanB[FLT-1] = median(FLT, hx1.historyB);
+	hx2.historyMeanA[FLT-1] = median(FLT, hx2.historyA);
+	hx2.historyMeanB[FLT-1] = median(FLT, hx2.historyB);
+
+	hx1.valueA = mean(FLT, hx1.historyMeanA);
+	hx1.valueB = mean(FLT, hx1.historyMeanB);
+	hx2.valueA = mean(FLT, hx2.historyMeanA);
+	hx2.valueB = mean(FLT, hx2.historyMeanB);
+
+//	hx1.valueA = hx1.readingA;
+//	hx1.valueB = hx1.readingB;
+//	hx2.valueA = hx2.readingA;
+//	hx2.valueB = hx2.readingB;
+
+	if(hx1.valueA < 20) hx1.valueA = 0;
+	if(hx1.valueB < 20) hx1.valueB = 0;
+	if(hx2.valueA < 20) hx2.valueA = 0;
+	if(hx2.valueB < 20) hx2.valueB = 0;
 }
 
 void Commands_BufferHandle(uint8_t* Buf, uint32_t *Len)
@@ -200,6 +220,14 @@ void Commands_Parse(char* buf, uint8_t len)
 	else if(_cmd_check(buf, len, "dfu", 3))
 	{
 		iDFU = 1;
+	}
+	else if(_cmd_check(buf, len, "temp", 4))
+	{
+		//wrong PCB naming
+	  offset += sprintf(&msg[offset], "T=%03d", temperature);
+
+	  msg[offset++] = '\n';
+	  CDC_Transmit_FS(msg, offset);
 	}
 
 }
