@@ -13,7 +13,7 @@ HX711 hx2;
 char command[30];
 uint16_t length = 0;
 uint8_t status = 0;
-uint8_t iCalibration = 87;
+uint16_t iCalibration = 7900;
 uint8_t iTare = 0;
 uint16_t temperature = 0;
 uint8_t iDFU = 0;

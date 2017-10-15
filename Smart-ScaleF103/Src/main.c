@@ -171,6 +171,10 @@ int main(void)
 
 	  if (iTare)
 	  {
+		HAL_GPIO_WritePin(hx1.gpioSck, hx1.pinSck, GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(hx2.gpioSck, hx2.pinSck, GPIO_PIN_RESET);
+		HAL_Delay(20);
+
 	    hx1.gain = 3;
 	    hx2.gain = 3;
 
@@ -188,7 +192,14 @@ int main(void)
 
 		hx1.offsetB = HX711_Average_Value(hx1, 20);
 		hx2.offsetB = HX711_Average_Value(hx2, 20);
+
 		iTare = 0;
+
+		HAL_GPIO_WritePin(hx1.gpioSck, hx1.pinSck, GPIO_PIN_RESET);
+	 	HAL_GPIO_WritePin(hx1.gpioSck, hx1.pinSck, GPIO_PIN_SET);
+	    HAL_GPIO_WritePin(hx2.gpioSck, hx2.pinSck, GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(hx2.gpioSck, hx2.pinSck, GPIO_PIN_SET);
+		HAL_Delay(20);
 	  }
 	  else
 	  {

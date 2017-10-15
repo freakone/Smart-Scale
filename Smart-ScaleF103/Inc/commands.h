@@ -12,7 +12,7 @@
 
 extern HX711 hx1;
 extern HX711 hx2;
-extern uint8_t iCalibration;
+extern uint16_t iCalibration;
 extern uint8_t iTare;
 extern uint16_t temperature;
 extern uint8_t iDFU;
