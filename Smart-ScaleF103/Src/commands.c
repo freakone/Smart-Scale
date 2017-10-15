@@ -191,10 +191,10 @@ void Commands_Parse(char* buf, uint8_t len)
 	} else if(_cmd_check(buf, len, "cal", 3))
 	{
 
-	  char num[] = {buf[4], buf[5]};
+	  char num[] = {buf[4], buf[5], buf[6], buf[7]};
 	  int param = strtol(num, NULL, 10);
 
-	  if(param > 30 && param < 100)
+	  if(param > 0 && param < 9999)
 	  {
 		  iCalibration = param;
 		  writeFlash();

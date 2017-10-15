@@ -171,6 +171,9 @@ int main(void)
 
 	  if (iTare)
 	  {
+	    hx1.gain = 3;
+	    hx2.gain = 3;
+
 		HX711_Average_Value(hx1, 100);
 		HX711_Average_Value(hx2, 100);
 
@@ -197,14 +200,14 @@ int main(void)
 		  hx2.gain = 2;
 		  HX711_Average_Value(hx1, 1);
 		  HX711_Average_Value(hx2, 1);
-		  hx1.readingB = (-(HX711_Average_Value(hx1, 2) - hx1.offsetB) * ((float)iCalibration/100))/1000;
-		  hx2.readingB = (-(HX711_Average_Value(hx2, 2) - hx2.offsetB) * ((float)iCalibration/100))/1000;
+		  hx1.readingB = (-(HX711_Average_Value(hx1, 2) - hx1.offsetB) * ((float)iCalibration/10000))/1000;
+		  hx2.readingB = (-(HX711_Average_Value(hx2, 2) - hx2.offsetB) * ((float)iCalibration/10000))/1000;
 		  hx1.gain = 3;
 		  hx2.gain = 3;
 		  HX711_Average_Value(hx1, 1);
 		  HX711_Average_Value(hx2, 1);
-		  hx1.readingA = (-(HX711_Average_Value(hx1, 2) - hx1.offsetA) * ((float)iCalibration/100))/2000;
-		  hx2.readingA = (-(HX711_Average_Value(hx2, 2) - hx2.offsetA) * ((float)iCalibration/100))/2000;
+		  hx1.readingA = (-(HX711_Average_Value(hx1, 2) - hx1.offsetA) * ((float)iCalibration/10000))/2000;
+		  hx2.readingA = (-(HX711_Average_Value(hx2, 2) - hx2.offsetA) * ((float)iCalibration/10000))/2000;
 		  HX711_Process_Values();
 
 		  HAL_GPIO_WritePin(hx1.gpioSck, hx1.pinSck, GPIO_PIN_RESET);
