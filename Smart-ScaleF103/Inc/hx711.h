@@ -2,7 +2,7 @@
 #define HX711_H_
 
 #include "stm32f1xx_hal.h"
-#define FLT 5
+#define FLT 2
 
 
 typedef struct _hx711

@@ -9,7 +9,7 @@
   * inserted by the user or by software development tools
   * are owned by their respective copyright owners.
   *
-  * Copyright (c) 2017 STMicroelectronics International N.V. 
+  * Copyright (c) 2018 STMicroelectronics International N.V. 
   * All rights reserved.
   *
   * Redistribution and use in source and binary forms, with or without 
@@ -171,12 +171,9 @@ int main(void)
 
 	  if (iTare)
 	  {
-		HAL_GPIO_WritePin(hx1.gpioSck, hx1.pinSck, GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(hx2.gpioSck, hx2.pinSck, GPIO_PIN_RESET);
-		HAL_Delay(20);
 
-	    hx1.gain = 3;
-	    hx2.gain = 3;
+	    hx1.gain = 1;
+	    hx2.gain = 1;
 
 		HX711_Average_Value(hx1, 100);
 		HX711_Average_Value(hx2, 100);
@@ -196,36 +193,49 @@ int main(void)
 		iTare = 0;
 
 		HAL_GPIO_WritePin(hx1.gpioSck, hx1.pinSck, GPIO_PIN_RESET);
-	 	HAL_GPIO_WritePin(hx1.gpioSck, hx1.pinSck, GPIO_PIN_SET);
-	    HAL_GPIO_WritePin(hx2.gpioSck, hx2.pinSck, GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(hx2.gpioSck, hx2.pinSck, GPIO_PIN_RESET);
+		HAL_Delay(3);
+		HAL_GPIO_WritePin(hx1.gpioSck, hx1.pinSck, GPIO_PIN_SET);
 		HAL_GPIO_WritePin(hx2.gpioSck, hx2.pinSck, GPIO_PIN_SET);
-		HAL_Delay(20);
+		HAL_Delay(100);
 	  }
 	  else
 	  {
 		  HAL_GPIO_WritePin(hx1.gpioSck, hx1.pinSck, GPIO_PIN_RESET);
 		  HAL_GPIO_WritePin(hx2.gpioSck, hx2.pinSck, GPIO_PIN_RESET);
-		  HAL_Delay(20);
+
+//		  HAL_Delay(10);
+//
+
+	//	  HAL_Delay(10);
+
+		  hx1.gain = 1;
+		  hx2.gain = 1;
+//		  hx1.readingA = HX711_Average_Value(hx1, 2);
+//		  hx2.readingA = HX711_Average_Value(hx2, 2);
+
+	//	  HAL_Delay(20);
+
+		  hx1.readingA = (-(HX711_Average_Value(hx1, 1) - hx1.offsetA) * ((float)iCalibration/10000))/4000;
+		  hx2.readingA = (-(HX711_Average_Value(hx2, 1) - hx2.offsetA) * ((float)iCalibration/10000))/4000;
+
 
 		  hx1.gain = 2;
 		  hx2.gain = 2;
-		  HX711_Average_Value(hx1, 1);
-		  HX711_Average_Value(hx2, 1);
-		  hx1.readingB = (-(HX711_Average_Value(hx1, 2) - hx1.offsetB) * ((float)iCalibration/10000))/1000;
-		  hx2.readingB = (-(HX711_Average_Value(hx2, 2) - hx2.offsetB) * ((float)iCalibration/10000))/1000;
-		  hx1.gain = 3;
-		  hx2.gain = 3;
-		  HX711_Average_Value(hx1, 1);
-		  HX711_Average_Value(hx2, 1);
-		  hx1.readingA = (-(HX711_Average_Value(hx1, 2) - hx1.offsetA) * ((float)iCalibration/10000))/2000;
-		  hx2.readingA = (-(HX711_Average_Value(hx2, 2) - hx2.offsetA) * ((float)iCalibration/10000))/2000;
-		  HX711_Process_Values();
+		  hx1.readingB = HX711_Average_Value(hx1, 1);
+		  hx2.readingB = HX711_Average_Value(hx2, 1);
 
-		  HAL_GPIO_WritePin(hx1.gpioSck, hx1.pinSck, GPIO_PIN_RESET);
+//		  HAL_Delay(20);
+
+		  hx1.readingB = (-(HX711_Average_Value(hx1, 1) - hx1.offsetB) * ((float)iCalibration/10000))/1000;
+		  hx2.readingB = (-(HX711_Average_Value(hx2, 1) - hx2.offsetB) * ((float)iCalibration/10000))/1000;
+
+
 		  HAL_GPIO_WritePin(hx1.gpioSck, hx1.pinSck, GPIO_PIN_SET);
-		  HAL_GPIO_WritePin(hx2.gpioSck, hx2.pinSck, GPIO_PIN_RESET);
 		  HAL_GPIO_WritePin(hx2.gpioSck, hx2.pinSck, GPIO_PIN_SET);
-		  HAL_Delay(20);
+		  HAL_Delay(70);
+
+		  HX711_Process_Values();
 	  }
 
 
@@ -262,7 +272,7 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
-  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV4;
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV2;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
