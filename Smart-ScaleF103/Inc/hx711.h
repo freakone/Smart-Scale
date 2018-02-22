@@ -2,7 +2,7 @@
 #define HX711_H_
 
 #include "stm32f1xx_hal.h"
-#define FLT 5
+#define FLT 3
 
 
 typedef struct _hx711
@@ -19,8 +19,6 @@ typedef struct _hx711
 	long valueB;
 	int historyA[FLT];
 	int historyB[FLT];
-	int historyMeanA[FLT];
-	int historyMeanB[FLT];
 	int offset;
 	int gain;
 	// 1: channel A, gain factor 128

@@ -44,7 +44,9 @@ long HX711_Value(HX711 data)
     for (uint8_t i = 0; i < 24; i++)
     {
     	HAL_GPIO_WritePin(data.gpioSck, data.pinSck, GPIO_PIN_SET);
+    	for(int a = 0; a < 1000; a++);
     	HAL_GPIO_WritePin(data.gpioSck, data.pinSck, GPIO_PIN_RESET);
+    	for(int a = 0; a < 1000; a++);
 
         buffer = buffer << 1 ;
 
@@ -57,7 +59,9 @@ long HX711_Value(HX711 data)
     for (int i = 0; i < data.gain; i++)
     {
     	HAL_GPIO_WritePin(data.gpioSck, data.pinSck, GPIO_PIN_SET);
+    	for(int a = 0; a < 1000; a++);
     	HAL_GPIO_WritePin(data.gpioSck, data.pinSck, GPIO_PIN_RESET);
+    	for(int a = 0; a < 1000; a++);
     }
 
     if ( buffer & 0x800000 ) {
